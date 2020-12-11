@@ -28,6 +28,17 @@ class DiscordRssBot(commands.Bot):
         @self.command()
         async def get_rss_info(ctx):
             await ctx.send(self.__format_torrents(self.reader.get_rss_info()))
+        
+        @self.command()
+        async def update_feed(ctx):
+            self.reader.update_current_feed(self.reader.rss_feed)
+            await ctx.send("Updated Feed")
+
+        @self.command()
+        async def set_feed(ctx, rss_feed):
+          self.reader.set_new_feed(rss_feed)
+          await ctx.send("RSS feed changed to {}".format(rss_feed))
+
 
     def __format_torrents(self, torrent_dict: dict):
         torrent_dict = "\n```{}\n```".format(

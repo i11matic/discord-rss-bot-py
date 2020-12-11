@@ -1,3 +1,7 @@
+import hashlib
+import requests
+import json
+import sys
 import feedparser
 
 
@@ -32,4 +36,25 @@ class RssReader(object):
     def check_content_length(self, torrents):
         if len(torrents) <= self.max_content_length:
             return True
+        return False
+
+    def update_current_feed(self, rss_url):
+        self.parsed_feed = feedparser.parse(rss_url)
+        self.torrent_dict = {}
+        self._make_torrent_dict()
+
+    def get_rss_hash(self):
+        return hashlib.md5(json.dumps(self.parsed_feed,
+                                      sort_keys=True)).hexdigest()
+
+    def set_new_feed(self, rss_url):
+        self.rss_feed = rss_url
+        self.update_current_feed(rss_url)
+
+    def __validate_url(self, url):
+        try:
+            requests.get(url).raise_for_status()
+            return True
+        except requests.exceptions.HTTPError as err:
+            print(err, file=sys.stder)
         return False
